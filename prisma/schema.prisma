@@ -7,24 +7,13 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model User {
-    id           String      @id @default(uuid())
-    name         String
-    email        String      @unique
-    password     String
-    role         UserRole
-    restaurantId String?
-    restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
-    createdAt    DateTime    @default(now())
-    updatedAt    DateTime    @updatedAt
-}
-
 model Restaurant {
-    id        String   @id @default(uuid())
-    name      String
-    email     String   @unique
-    password  String
-    users     User[]
+    id       String @id @default(uuid())
+    name     String
+
+    // will come from clerk
+    organizationId String @unique
+
     menus     Menu[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -50,8 +39,10 @@ model MenuItem {
     details         String?
     categoryId      String?
     category        Category? @relation(fields: [categoryId], references: [id])
+    
     availableFrom   String?
     availableUntil  String?
+    
     availableMonths Int[]
     createdAt       DateTime  @default(now())
     updatedAt       DateTime  @updatedAt
@@ -63,9 +54,4 @@ model Category {
     items     MenuItem[]
     createdAt DateTime   @default(now())
     updatedAt DateTime   @updatedAt
-}
-
-enum UserRole {
-    OWNER
-    EMPLOYEE
 }

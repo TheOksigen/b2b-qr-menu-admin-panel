@@ -15,7 +15,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html
+      suppressHydrationWarning
+      lang="en"
+      className={`${GeistSans.variable}`}
+    >
       <body>
         <ThemeProvider
           attribute="class"
@@ -27,10 +31,10 @@ export default function RootLayout({
             <div className="relative flex min-h-screen flex-col">
               <Header ownerName="John" />
               <div className="flex-1">{children}</div>
-            </div>            
+            </div>
           </TRPCReactProvider>
         </ThemeProvider>
-      </body> 
+      </body>
     </html>
   );
 }

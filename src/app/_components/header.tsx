@@ -1,42 +1,39 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Moon, Sun, Search, Menu } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { Button } from '@/app/_components/ui/button'
-import { Input } from '@/app/_components/ui/input'
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/app/_components/ui/sheet"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Moon, Sun, Search, Menu } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Button } from "@/app/_components/ui/button";
+import { Input } from "@/app/_components/ui/input";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/app/_components/ui/sheet";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 type HeaderProps = {
   ownerName: string;
-}
+};
 
 export function Header({ ownerName }: HeaderProps) {
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const menuItems = [
-    { name: 'Restaurant', href: '/restaurant' },
-    { name: 'User', href: '/user' },
-    { name: 'Menu', href: '/menu' },
-    { name: 'Menu Item', href: '/menu-item' },
-    { name: 'Category', href: '/category' },
-  ]
+    { name: "Restaurant", href: "/restaurant" },
+    { name: "User", href: "/user" },
+    { name: "Menu", href: "/menu" },
+    { name: "Menu Item", href: "/menu-item" },
+    { name: "Category", href: "/category" },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 w-full flex justify-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 flex w-full justify-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center px-4">
         {/* Left Section: Logo and Navigation Button */}
-        <div className="flex items-center justify-between w-full space-x-4">
+        <div className="flex w-full items-center justify-between space-x-4">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -45,9 +42,16 @@ export function Header({ ownerName }: HeaderProps) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <VisuallyHidden>
+                <SheetTitle>Nav Content</SheetTitle>
+              </VisuallyHidden>
               <nav className="flex flex-col space-y-4">
                 {menuItems.map((item) => (
-                  <Link key={item.name} href={item.href} className="text-lg font-medium">
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-lg font-medium"
+                  >
                     {item.name}
                   </Link>
                 ))}
@@ -76,7 +80,7 @@ export function Header({ ownerName }: HeaderProps) {
               variant="ghost"
               size="icon"
               aria-label="Toggle theme"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {mounted && (
                 <>
@@ -90,6 +94,5 @@ export function Header({ ownerName }: HeaderProps) {
         </div>
       </div>
     </header>
-
-  )
+  );
 }

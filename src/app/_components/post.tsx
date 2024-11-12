@@ -50,12 +50,12 @@
 // }
 
 
-import React from 'react'
+// import React from 'react'
 
-const post = () => {
-  return (
-    <div>post</div>
-  )
-}
+// const post = () => {
+//   return (
+//     <div>post</div>
+//   )
+// }
 
-export default post
+// export default post

@@ -30,7 +30,7 @@ export default function RootLayout({
             </div>            
           </TRPCReactProvider>
         </ThemeProvider>
-      </body>
+      </body> 
     </html>
   );
 }

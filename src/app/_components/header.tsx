@@ -33,9 +33,10 @@ export function Header({ ownerName }: HeaderProps) {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 flex items-center">
+    <header className="sticky top-0 z-50 w-full flex justify-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center px-4">
+        {/* Left Section: Logo and Navigation Button */}
+        <div className="flex items-center justify-between w-full space-x-4">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -54,12 +55,14 @@ export function Header({ ownerName }: HeaderProps) {
             </SheetContent>
           </Sheet>
           <Link href="/" className="flex items-center space-x-2">
-            <span className="font-bold inline-block">
+            <span className="font-bold">
               {ownerName}'s Restaurant Dashboard
             </span>
           </Link>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-2">
+
+        {/* Right Section: Search and Theme Toggle */}
+        <div className="flex items-center space-x-4">
           <form className="relative hidden md:block">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -73,7 +76,6 @@ export function Header({ ownerName }: HeaderProps) {
               variant="ghost"
               size="icon"
               aria-label="Toggle theme"
-              className="mr-2"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               {mounted && (
@@ -88,5 +90,6 @@ export function Header({ ownerName }: HeaderProps) {
         </div>
       </div>
     </header>
+
   )
 }

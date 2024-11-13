@@ -13,6 +13,9 @@
 /prisma/db.sqlite-journal
 db.sqlite
 
+#bun
+bun.lockb
+
 # next.js
 /.next/
 /out/

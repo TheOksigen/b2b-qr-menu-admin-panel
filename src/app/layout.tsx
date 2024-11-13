@@ -3,12 +3,10 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "./_components/theme-provider";
-import { api } from "@/trpc/server";
 import { SidebarProvider, SidebarTrigger } from "./_components/ui/sidebar";
-import { AppSidebar } from "./_components/app-slidebar";
+import { AppSidebar } from "./_components/app-sidebar";
 import { cookies } from "next/headers";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-
+import ModeToggle from "./_components/theme-switcher";
 
 export const metadata: Metadata = {
   title: "Dashboard Link-a-menu",
@@ -18,26 +16,19 @@ export const metadata: Metadata = {
 
 interface RootLayoutProps {
   children: React.ReactNode;
-  props: {
-    id: string;
-  };
 }
 
 export default async function RootLayout({
   children,
-  props
 }: RootLayoutProps) {
-  const cookieStore = await cookies()
-  const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
+  const cookieStore = cookies()
+  const defaultOpen = (await cookieStore).get("sidebar:state")?.value === "true"
 
-
-
-  // const { data } = api.restaurant.getById.useQuery({ id: props.id })
   return (
     <html
       suppressHydrationWarning
       lang="en"
-      className={`${GeistSans.variable}`}
+      className={GeistSans.variable}
     >
       <body>
         <ThemeProvider
@@ -48,18 +39,12 @@ export default async function RootLayout({
         >
           <TRPCReactProvider>
             <SidebarProvider defaultOpen={defaultOpen}>
-              {/* <VisuallyHidden> */}
-                <AppSidebar />
-                <main>
-                  <SidebarTrigger />
-                  {children}
-                </main>
-              {/* </VisuallyHidden> */}
+              <AppSidebar />
+              <main className="flex-1 overflow-y-auto">
+                {/* <SidebarTrigger className="mt-3  hidden md:block" /> */}
+                {children}
+              </main>
             </SidebarProvider>
-            {/* <div className="relative flex min-h-screen flex-col">
-              <Header ownerName={data?.name || "Unknown"} />
-              <div className="flex-1">{children}</div>
-            </div> */}
           </TRPCReactProvider>
         </ThemeProvider>
       </body>

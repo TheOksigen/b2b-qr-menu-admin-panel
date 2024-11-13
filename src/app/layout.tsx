@@ -1,9 +1,14 @@
-import "@/styles/globals.css";
+import "./styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "./_components/theme-provider";
-import { Header } from "./_components/header";
+import { api } from "@/trpc/server";
+import { SidebarProvider, SidebarTrigger } from "./_components/ui/sidebar";
+import { AppSidebar } from "./_components/app-slidebar";
+import { cookies } from "next/headers";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+
 
 export const metadata: Metadata = {
   title: "Dashboard Link-a-menu",
@@ -11,9 +16,23 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+interface RootLayoutProps {
+  children: React.ReactNode;
+  props: {
+    id: string;
+  };
+}
+
+export default async function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  props
+}: RootLayoutProps) {
+  const cookieStore = await cookies()
+  const defaultOpen = cookieStore.get("sidebar:state")?.value === "true"
+
+
+
+  // const { data } = api.restaurant.getById.useQuery({ id: props.id })
   return (
     <html
       suppressHydrationWarning
@@ -28,10 +47,19 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TRPCReactProvider>
-            <div className="relative flex min-h-screen flex-col">
-              <Header ownerName="John" />
+            <SidebarProvider defaultOpen={defaultOpen}>
+              {/* <VisuallyHidden> */}
+                <AppSidebar />
+                <main>
+                  <SidebarTrigger />
+                  {children}
+                </main>
+              {/* </VisuallyHidden> */}
+            </SidebarProvider>
+            {/* <div className="relative flex min-h-screen flex-col">
+              <Header ownerName={data?.name || "Unknown"} />
               <div className="flex-1">{children}</div>
-            </div>
+            </div> */}
           </TRPCReactProvider>
         </ThemeProvider>
       </body>

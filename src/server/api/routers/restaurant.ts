@@ -32,7 +32,7 @@ export const restaurantRouter = createTRPCRouter({
       return ctx.db.restaurant.create({
         data: {
           ...input,
-          organizationId: user.orgId,
+          organizationId: user.orgId as string,
         },
       });
     }),
@@ -88,27 +88,28 @@ export const restaurantRouter = createTRPCRouter({
       });
     }),
 
-  getAll: protectedProcedure.query(async ({ ctx }) => {
-    const { user } = ctx;
+  getAll: protectedProcedure
+    .query(async ({ ctx }) => {
+      const { user } = ctx;
 
-    if (!user.orgId || !user.orgPermissions) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User does not have an organization",
+      if (!user.orgId || !user.orgPermissions) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User does not have an organization",
+        });
+      }
+
+      if (!user.orgPermissions.includes("org:restaurant:read")) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User does not have permission to read restaurants",
+        });
+      }
+
+      return ctx.db.restaurant.findMany({
+        where: { organizationId: user.orgId },
       });
-    }
-
-    if (!user.orgPermissions.includes("org:restaurant:read")) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User does not have permission to read restaurants",
-      });
-    }
-
-    return ctx.db.restaurant.findMany({
-      where: { organizationId: user.orgId },
-    });
-  }),
+    }),
 
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))

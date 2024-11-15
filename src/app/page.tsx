@@ -1,11 +1,9 @@
-import { SidebarTrigger } from "./_components/ui/sidebar";
+import { SignUp } from '@clerk/nextjs'
 
-export default async function DashboardPage() {
-
+const page = () => {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4"><SidebarTrigger /> Dashboard</h1>
-
-    </div>
-  );
+    <SignUp fallbackRedirectUrl="/dashboard" />
+  )
 }
+
+export default page

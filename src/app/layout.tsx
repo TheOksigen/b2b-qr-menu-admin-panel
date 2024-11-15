@@ -3,10 +3,15 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "./_components/theme-provider";
-import { SidebarProvider, SidebarTrigger } from "./_components/ui/sidebar";
-import { AppSidebar } from "./_components/app-sidebar";
-import { cookies } from "next/headers";
-import ModeToggle from "./_components/theme-switcher";
+
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUp,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from '@clerk/nextjs'
 
 export const metadata: Metadata = {
   title: "Dashboard Link-a-menu",
@@ -21,33 +26,32 @@ interface RootLayoutProps {
 export default async function RootLayout({
   children,
 }: RootLayoutProps) {
-  const cookieStore = cookies()
-  const defaultOpen = (await cookieStore).get("sidebar:state")?.value === "true"
 
   return (
-    <html
-      suppressHydrationWarning
-      lang="en"
-      className={GeistSans.variable}
-    >
-      <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <TRPCReactProvider>
-            <SidebarProvider defaultOpen={defaultOpen}>
-              <AppSidebar />
-              <main className="flex-1 overflow-y-auto">
-                {/* <SidebarTrigger className="mt-3  hidden md:block" /> */}
+    <ClerkProvider>
+      <html
+        suppressHydrationWarning
+        lang="en"
+        className={GeistSans.variable}
+      >
+        <body>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TRPCReactProvider>
+              <main className="flex items-center justify-center h-screen overflow-y-auto">
+                {/* <SignedOut>
+                  <SignInButton />
+                </SignedOut> */}                
                 {children}
               </main>
-            </SidebarProvider>
-          </TRPCReactProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+            </TRPCReactProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

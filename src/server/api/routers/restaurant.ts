@@ -1,7 +1,4 @@
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
@@ -58,7 +55,7 @@ export const restaurantRouter = createTRPCRouter({
       }
 
       return ctx.db.restaurant.update({
-        where: { id, organizationId: user.orgId },
+        where: { id, organizationId: user.orgId, deletedAt: null },
         data,
       });
     }),
@@ -83,33 +80,33 @@ export const restaurantRouter = createTRPCRouter({
         });
       }
 
-      return ctx.db.restaurant.delete({
-        where: { id, organizationId: user.orgId },
+      return ctx.db.restaurant.update({
+        where: { id, organizationId: user.orgId, deletedAt: null },
+        data: { deletedAt: new Date() },
       });
     }),
 
-  getAll: protectedProcedure
-    .query(async ({ ctx }) => {
-      const { user } = ctx;
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    const { user } = ctx;
 
-      if (!user.orgId || !user.orgPermissions) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User does not have an organization",
-        });
-      }
-
-      if (!user.orgPermissions.includes("org:restaurant:read")) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User does not have permission to read restaurants",
-        });
-      }
-
-      return ctx.db.restaurant.findMany({
-        where: { organizationId: user.orgId },
+    if (!user.orgId || !user.orgPermissions) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User does not have an organization",
       });
-    }),
+    }
+
+    if (!user.orgPermissions.includes("org:restaurant:read")) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User does not have permission to read restaurants",
+      });
+    }
+
+    return ctx.db.restaurant.findMany({
+      where: { organizationId: user.orgId, deletedAt: null },
+    });
+  }),
 
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
@@ -132,7 +129,7 @@ export const restaurantRouter = createTRPCRouter({
       }
 
       const restaurant = await ctx.db.restaurant.findUnique({
-        where: { id, organizationId: user.orgId },
+        where: { id, organizationId: user.orgId, deletedAt: null },
       });
 
       if (!restaurant) {

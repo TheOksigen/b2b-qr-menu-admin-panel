@@ -8,13 +8,14 @@ datasource db {
 }
 
 model Restaurant {
-    id       String @id @default(uuid())
-    name     String
+    id             String    @id @default(uuid())
+    name           String
     // will come from clerk
-    organizationId String @unique
-    menus     Menu[]
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    organizationId String
+    menus          Menu[]
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
+    deletedAt      DateTime?
 }
 
 model Menu {
@@ -26,24 +27,26 @@ model Menu {
     items        MenuItem[]
     createdAt    DateTime   @default(now())
     updatedAt    DateTime   @updatedAt
+    deletedAt    DateTime?
 }
 
 model MenuItem {
-    id              String    @id @default(uuid())
-    menuId          String
-    menu            Menu      @relation(fields: [menuId], references: [id])
-    name            String
-    price           Float
-    details         String?
-    categoryId      String?
-    category        Category? @relation(fields: [categoryId], references: [id])
-    
-    availableFrom   String?
-    availableUntil  String?
-    
+    id         String    @id @default(uuid())
+    menuId     String
+    menu       Menu      @relation(fields: [menuId], references: [id])
+    name       String
+    price      Float
+    details    String?
+    categoryId String?
+    category   Category? @relation(fields: [categoryId], references: [id])
+
+    availableFrom  String?
+    availableUntil String?
+
     availableMonths Int[]
     createdAt       DateTime  @default(now())
     updatedAt       DateTime  @updatedAt
+    deletedAt       DateTime?
 }
 
 model Category {
@@ -52,4 +55,5 @@ model Category {
     items     MenuItem[]
     createdAt DateTime   @default(now())
     updatedAt DateTime   @updatedAt
+    deletedAt DateTime?
 }

@@ -39,7 +39,7 @@ export const categoryRouter = createTRPCRouter({
       const { id, ...data } = input;
 
       return ctx.db.category.update({
-        where: { id },
+        where: { id, deletedAt: null },
         data,
       });
     }),
@@ -47,8 +47,11 @@ export const categoryRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.category.delete({
-        where: { id: input.id },
+      return ctx.db.category.update({
+        where: { id: input.id, deletedAt: null },
+        data: {
+          deletedAt: new Date(),
+        },
       });
     }),
 
@@ -64,6 +67,7 @@ export const categoryRouter = createTRPCRouter({
       const cursor = input.cursor;
 
       const items = await ctx.db.category.findMany({
+        where: { deletedAt: null },
         take: limit + 1,
         cursor: cursor ? { id: cursor } : undefined,
         include: {
@@ -72,7 +76,7 @@ export const categoryRouter = createTRPCRouter({
       });
 
       let nextCursor: typeof cursor | undefined = undefined;
-      
+
       if (items.length > limit) {
         const nextItem = items.pop();
         nextCursor = nextItem!.id;
@@ -88,7 +92,7 @@ export const categoryRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const category = await ctx.db.category.findUnique({
-        where: { id: input.id },
+        where: { id: input.id, deletedAt: null },
         include: {
           items: true,
         },

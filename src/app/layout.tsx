@@ -1,12 +1,11 @@
 import "@/styles/globals.css";
+
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "@/components/theme-provider";
 
-import {
-  ClerkProvider,
-} from '@clerk/nextjs'
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "Dashboard Link-a-menu",
@@ -18,17 +17,10 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default async function RootLayout({
-  children,
-}: RootLayoutProps) {
-
+export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <ClerkProvider>
-      <html
-        suppressHydrationWarning
-        lang="en"
-        className={GeistSans.variable}
-      >
+      <html suppressHydrationWarning lang="en" className={GeistSans.variable}>
         <body>
           <ThemeProvider
             attribute="class"
@@ -37,10 +29,10 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <TRPCReactProvider>
-              <main className="flex items-center justify-center h-screen overflow-y-auto">
+              <main className="flex h-screen items-center justify-center overflow-y-auto">
                 {/* <SignedOut>
                   <SignInButton />
-                </SignedOut> */}                
+                </SignedOut> */}
                 {children}
               </main>
             </TRPCReactProvider>

@@ -1,5 +1,7 @@
+"use client";
+
 import * as React from "react";
-import { GalleryVerticalEnd, Plus } from "lucide-react";
+import { dark } from "@clerk/themes";
 
 import {
   Sidebar,
@@ -14,18 +16,16 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { Button } from "./ui/button";
-import ModeToggle from "./theme-switcher";
+import ModeToggle from "@/components/theme-switcher";
+import { OrganizationSwitcher } from "@clerk/nextjs";
+import { useTheme } from "next-themes";
 
-// This is sample data.
-const data: Record<
-  string,
-  {
-    title: string;
-    url: string;
-    items: { title: string; url: string, isActive?: boolean }[];
-  }[]
-> = {
+type Node = {
+  title: string;
+  url: string;
+  items?: Node[];
+};
+const data: Record<string, Node[]> = {
   navMain: [
     {
       title: "Getting Started",
@@ -83,21 +83,22 @@ const data: Record<
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { theme } = useTheme();
   return (
     <Sidebar variant="floating" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <GalleryVerticalEnd className="size-4" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Documentation</span>
-                  <span className="">v1.0.0</span>
-                </div>
-              </a>
+              <div className="flex flex-col gap-0.5 leading-none">
+                <>
+                  <OrganizationSwitcher
+                    appearance={{
+                      baseTheme: theme === "dark" ? dark : undefined,
+                    }}
+                  />
+                </>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -116,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuSub className="ml-0 border-l-0 px-1.5">
                     {item.items.map((item) => (
                       <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild isActive={item.isActive}>
+                        <SidebarMenuSubButton asChild>
                           <a href={item.url}>{item.title}</a>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>

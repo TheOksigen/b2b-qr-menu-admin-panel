@@ -1,16 +1,11 @@
-import "./styles/globals.css";
+import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
-import { ThemeProvider } from "./_components/theme-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import {
   ClerkProvider,
-  SignInButton,
-  SignUp,
-  SignedIn,
-  SignedOut,
-  UserButton
 } from '@clerk/nextjs'
 
 export const metadata: Metadata = {

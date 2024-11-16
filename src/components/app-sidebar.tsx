@@ -1,5 +1,5 @@
-import * as React from "react"
-import { GalleryVerticalEnd, Plus } from "lucide-react"
+import * as React from "react";
+import { GalleryVerticalEnd, Plus } from "lucide-react";
 
 import {
   Sidebar,
@@ -13,12 +13,19 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/app/_components/ui/sidebar"
-import { Button } from "./ui/button"
-import ModeToggle from "./theme-switcher"
+} from "@/components/ui/sidebar";
+import { Button } from "./ui/button";
+import ModeToggle from "./theme-switcher";
 
 // This is sample data.
-const data = {
+const data: Record<
+  string,
+  {
+    title: string;
+    url: string;
+    items: { title: string; url: string, isActive?: boolean }[];
+  }[]
+> = {
   navMain: [
     {
       title: "Getting Started",
@@ -45,7 +52,6 @@ const data = {
         {
           title: "Data Fetching",
           url: "#",
-          isActive: true,
         },
         {
           title: "Rendering",
@@ -71,12 +77,10 @@ const data = {
           title: "Testing",
           url: "#",
         },
-     
       ],
     },
-   
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -101,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu className="gap-2">
-            {data.navMain.map((item) => (
+            {data["navMain"]!.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
                   <a href={item.url} className="font-medium">
@@ -125,8 +129,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-            <ModeToggle/>        
+        <ModeToggle />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

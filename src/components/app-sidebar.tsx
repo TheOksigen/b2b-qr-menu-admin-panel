@@ -84,6 +84,7 @@ const data: Record<string, Node[]> = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { theme } = useTheme();
+
   return (
     <Sidebar variant="floating" {...props}>
       <SidebarHeader>

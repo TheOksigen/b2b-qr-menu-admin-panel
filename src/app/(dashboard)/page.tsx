@@ -7,6 +7,7 @@ export default async function DashboardPage() {
   const client = await clerkClient();
   const user = await cachedAuth();
 
+  
   const orgs = await client.users.getOrganizationMembershipList({
     userId: user.userId!,
   });
@@ -35,6 +36,21 @@ export default async function DashboardPage() {
     const restaurant = await api.restaurant.delete({ id });
 
     console.log(restaurant);
+
+    redirect("/");
+  } 
+
+
+  async function createMenu (formData: FormData) {
+    "use server";
+
+    const name = formData.get("name") as string;
+
+    const menu = await api.menu.createMenu({
+      
+    })
+
+    console.log(menu);
 
     redirect("/");
   }

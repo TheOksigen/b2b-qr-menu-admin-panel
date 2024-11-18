@@ -2,88 +2,32 @@
 
 import * as React from "react";
 import { dark } from "@clerk/themes";
-
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import ModeToggle from "@/components/theme-switcher";
 import { OrganizationSwitcher } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
-
-type Node = {
-  title: string;
-  url: string;
-  items?: Node[];
-};
-const data: Record<string, Node[]> = {
-  navMain: [
-    {
-      title: "Getting Started",
-      url: "#",
-      items: [
-        {
-          title: "Installation",
-          url: "#",
-        },
-        {
-          title: "Project Structure",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Building Your Application",
-      url: "#",
-      items: [
-        {
-          title: "Routing",
-          url: "#",
-        },
-        {
-          title: "Data Fetching",
-          url: "#",
-        },
-        {
-          title: "Rendering",
-          url: "#",
-        },
-        {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-      ],
-    },
-  ],
-};
+import { api } from "@/trpc/react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { ChevronRight } from "lucide-react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { theme } = useTheme();
+  const { data: restaurants, isLoading } = api.restaurant.getAll.useQuery();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Sidebar variant="floating" {...props}>
@@ -92,44 +36,63 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <div className="flex flex-col gap-0.5 leading-none">
-                <>
-                  <OrganizationSwitcher
-                    appearance={{
-                      baseTheme: theme === "dark" ? dark : undefined,
-                    }}
-                  />
-                </>
+                <OrganizationSwitcher
+                  appearance={{
+                    baseTheme: theme === "dark" ? dark : undefined,
+                  }}
+                />
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu className="gap-2">
-            {data["navMain"]!.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url} className="font-medium">
-                    {item.title}
-                  </a>
-                </SidebarMenuButton>
-                {item.items?.length ? (
-                  <SidebarMenuSub className="ml-0 border-l-0 px-1.5">
-                    {item.items.map((item) => (
-                      <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild>
-                          <a href={item.url}>{item.title}</a>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                ) : null}
-              </SidebarMenuItem>
+            {restaurants?.map((restaurant) => (
+              <Collapsible
+                key={restaurant.id}
+                defaultOpen={true}
+                className="group"
+              >
+                <SidebarGroup>
+                  <SidebarGroupLabel asChild>
+                    <CollapsibleTrigger className="flex items-center text-sm font-medium hover:bg-sidebar-accent px-2 py-1 rounded">
+                      {restaurant.name}{" "}
+                      <ChevronRight className="ml-auto transition-transform group-data-[state=open]:rotate-90" />
+                    </CollapsibleTrigger>
+                  </SidebarGroupLabel>
+                  <CollapsibleContent>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {restaurant.menus.map((menu) => (
+                          
+                          <SidebarMenuItem
+                            key={menu.id}
+                            className="pl-6 py-1.5 text-xs text-gray-300 rounded-md"
+                          >
+                            <SidebarMenuButton asChild>
+                              <a
+                                href={`/menus/${menu.id}`}
+                                className="block w-full font-medium hover:underline"
+                              >
+                                {menu.title}
+                              </a>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+
+                        ))}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </CollapsibleContent>
+                </SidebarGroup>
+              </Collapsible>
             ))}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter>
         <ModeToggle />
       </SidebarFooter>

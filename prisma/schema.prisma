@@ -8,14 +8,17 @@ datasource db {
 }
 
 model Restaurant {
-    id             String    @id @default(uuid())
+    id             String @id @default(uuid())
     name           String
     // will come from clerk
     organizationId String
     menus          Menu[]
-    createdAt      DateTime  @default(now())
-    updatedAt      DateTime  @updatedAt
-    deletedAt      DateTime?
+
+    activeMenu String?
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
 }
 
 model Menu {

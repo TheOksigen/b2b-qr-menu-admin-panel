@@ -1,84 +1,127 @@
-import { cachedAuth } from "@/server/auth";
-import { api } from "@/trpc/server";
-import { clerkClient } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+'use client'
 
-export default async function DashboardPage() {
-  const client = await clerkClient();
-  const user = await cachedAuth();
+import { useState } from 'react'
+import { api } from "@/trpc/react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { PlusCircle } from 'lucide-react'
 
-  
-  const orgs = await client.users.getOrganizationMembershipList({
-    userId: user.userId!,
-  });
+export default function DashboardPage() {
+  const [newMenuName, setNewMenuName] = useState('')
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState('')
+  const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false)
+  const [newMenuDescription, setNewMenuDescription] = useState('')
 
-  const restaurants = await api.restaurant.getAll();
+  const { data: restaurants, refetch: refetchRestaurants } = api.restaurant.getAll.useQuery()
 
-  async function createOrg(formData: FormData) {
-    "use server";
+  const createMenuMutation = api.menu.createMenu.useMutation({
+    onSuccess: () => {
+      setNewMenuName('')
+      refetchRestaurants()
+      setIsCreateMenuOpen(false)
+    },
+  })
 
-    const name = formData.get("name") as string;
-
-    const restaurant = await api.restaurant.create({
-      name,
-    });
-
-    console.log(restaurant);
-
-    redirect("/");
-  }
-
-  async function deleteRestaurant(formData: FormData) {
-    "use server";
-
-    const id = formData.get("id") as string;
-
-    const restaurant = await api.restaurant.delete({ id });
-
-    console.log(restaurant);
-
-    redirect("/");
-  } 
-
-
-  async function createMenu (formData: FormData) {
-    "use server";
-
-    const name = formData.get("name") as string;
-
-    const menu = await api.menu.createMenu({
-      
-    })
-
-    console.log(menu);
-
-    redirect("/");
+  const handleCreateMenu = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedRestaurantId) return
+    await createMenuMutation.mutateAsync({ title: newMenuName, restaurantId: selectedRestaurantId })
   }
 
   return (
-    <div>
-      {orgs.data.map((org, index) => (
-        <div key={index}>
-          {org.organization.id} - {org.organization.name} - {org.role}
-        </div>
-      ))}
-      <br />
-      <br />
-      {restaurants.map((restaurant, index) => (
-        <form action={deleteRestaurant}>
-          <input type="hidden" name="id" value={restaurant.id} />
-          <div key={index}>
-            <span>
-              {restaurant.id} - {restaurant.name} - {restaurant.organizationId}
-            </span>
-          </div>
-          <button>Clickmyass</button>
-        </form>
-      ))}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="mb-8 text-3xl font-bold">Menu Maker Dashboard</h1>
 
-      <form action={createOrg} className="border border-red-500">
-        <input type="text" name="name" required />
-      </form>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>  change to create restaurant
+          <CardHeader>
+            <CardTitle>Create New Menu</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Dialog open={isCreateMenuOpen} onOpenChange={setIsCreateMenuOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Create New Menu
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Menu</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleCreateMenu} className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="restaurant-select" className="text-sm font-medium">Select Restaurant</label>
+                    <select
+                      id="restaurant-select"
+                      value={selectedRestaurantId}
+                      onChange={(e) => setSelectedRestaurantId(e.target.value)}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      required
+                    >
+                      <option value="">Select a restaurant</option>
+                      {restaurants?.map((restaurant) => (
+                        <option key={restaurant.id} value={restaurant.id}>
+                          {restaurant.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="menu-name" className="text-sm font-medium">Menu Name</label>
+                    <Input
+                      id="menu-name"
+                      value={newMenuName}
+                      onChange={(e) => setNewMenuName(e.target.value)}
+                      placeholder="Enter menu name"
+                      required
+                    />
+                  </div>
+                  <div className='space-y-2'>
+                    <label htmlFor="menu-descripton" className='text-sm font-medium'>Menu Descripton</label>
+                    <Input
+                      id="menu-description"
+                      value={newMenuDescription}
+                      onChange={(e) => setNewMenuDescription(e.target.value)}
+                      placeholder="Enter menu description"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full">Create Menu</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Restaurants</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {restaurants?.length === 0 ? (
+              <p className="text-muted-foreground">No restaurants found.</p>
+            ) : (
+              <ul className="space-y-2">
+                {restaurants?.map((restaurant) => (
+                  <li key={restaurant.id} className="flex items-center justify-between rounded-md bg-muted/60 p-3">
+                    <span className="font-medium">{restaurant.name}</span>
+                    {restaurant.activeMenu && (
+                      <span className="text-sm text-muted-foreground">
+                        Active Menu: {restaurant.activeMenu.name}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+
+      </div>
     </div>
-  );
+  )
 }

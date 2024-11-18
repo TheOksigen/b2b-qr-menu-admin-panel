@@ -16,7 +16,7 @@ const createMenuSchema = z.object({
       availableUntil: z.string().optional(),
       availableMonths: z.array(z.number().int().min(1).max(12)).optional(),
     })
-  ).nonempty("At least one item is required"),
+  ).optional()
 });
 
 /*

@@ -105,6 +105,7 @@ export const restaurantRouter = createTRPCRouter({
 
     return ctx.db.restaurant.findMany({
       where: { organizationId: user.orgId, deletedAt: null },
+      include: { menus: true },
     });
   }),
 
